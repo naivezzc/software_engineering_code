@@ -19,6 +19,10 @@ type Board [BoardSize][BoardSize]string
 var currentPlayer string
 
 func main() {
+	playGame()
+}
+
+func playGame() {
 	board := initializeBoard()
 	currentPlayer = Black
 
@@ -53,12 +57,12 @@ func main() {
 			continue
 		}
 
-		if board[x][y] != Empty {
+		if !isEmptyPosition(board, x, y) {
 			fmt.Println("The specified position is not empty!")
 			continue
 		}
 
-		board[y][x] = color
+		board[x][y] = color
 
 		// 切换玩家
 		if currentPlayer == Black {
@@ -79,7 +83,7 @@ func initializeBoard() Board {
 		}
 	}
 
-	board[2][3] = White
+	board[3][3] = White
 	board[3][4] = Black
 	board[4][3] = Black
 	board[4][4] = White
@@ -104,6 +108,10 @@ func parseInput(parts []string) (int, int, string) {
 	y := -1
 	color := ""
 
+	if len(parts[0]) != 1 || len(parts[1]) != 1 || len(parts[2]) != 1 {
+		return x, y, color
+	}
+
 	// 解析输入的x坐标
 	switch strings.ToUpper(parts[0]) {
 	case "A":
@@ -127,14 +135,36 @@ func parseInput(parts []string) (int, int, string) {
 	}
 
 	// 解析输入的y坐标
-	_, err := fmt.Sscanf(parts[1], "%d", &y)
-	if err != nil {
+	switch parts[1] {
+	case "1":
+		y = 7
+	case "2":
+		y = 6
+	case "3":
+		y = 5
+	case "4":
+		y = 4
+	case "5":
+		y = 3
+	case "6":
+		y = 2
+	case "7":
+		y = 1
+	case "8":
+		y = 0
+	default:
 		return x, y, color
 	}
-	y-- // 调整为数组索引
 
 	// 解析输入的颜色
-	color = strings.ToUpper(parts[2])
+	switch strings.ToUpper(parts[2]) {
+	case "B":
+		color = Black
+	case "W":
+		color = White
+	default:
+		return x, y, color
+	}
 
 	return x, y, color
 }
@@ -143,6 +173,6 @@ func isValidColor(color string) bool {
 	return color == Black || color == White
 }
 
-//你可以在这个代码框中输入x、y和color的值，以便放置棋子。例如，输入"A 1 B"表示在A1位置放置黑子。输入"quit"可以退出游戏。
-//请在下方输入x、y和color的值，并按Enter键执行放置棋子的操作。このコードボックスにx、y、colorの値を入力して駒を置くことができます。 たとえば、「A 1 B」と入力すると、A1の位置に黒点が配置されます。 「quit」と入力するとゲームを終了できます。
-//下にx、y、colorの値を入力し、Enterキーを押して駒を置く操作を実行してください
+func isEmptyPosition(board Board, x, y int) bool {
+	return board[x][y] == Empty
+}
