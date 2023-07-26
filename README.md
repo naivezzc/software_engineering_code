@@ -1,24 +1,8 @@
 # 1.Introduction
  The purpose of this repository is to preserve the source code from the software engineering course.
  We have developed a chess game with the following features:
-## 1.1 Functions
- * Basic function
-   * Initialize Board
-   * Input function
-   * Check if Input is vaild
-   * Reverse function
-   * count function
- * Extra function
-   * Board visualize
-   * Save and load game
-## 1.2 Directory  description
-* img/ --images that used in readme.md file
-* jamboard/ --jamboard images week5-week8
-* main/ --test code
-* game_vis.go game code with board visualization
-* game.go game code without board visuailization
 
-## 1.3 Game rules
+## 1.1 Game rules
 * The game is played on a 8-by-8 grid of the board
 * Players take turns placing their discs on empty squares.
 * A player must place their disc in such a way that it "flips" the opponent's discs, turning them
@@ -29,6 +13,25 @@
 * If a player cannot make a valid move, their turn is forfeited.
 * The game ends when the board is full, or neither player can make a move.
 * The player with the most discs of their color on the board wins.
+
+## 1.2 Functions
+ * Basic function
+   * Initialize Board
+   * Input function
+   * Check if Input is vaild
+   * Reverse function
+   * count function
+ * Extra function
+   * Board visualize
+   * Save and load game
+## 1.3 Directory  description
+* img/ --images that used in readme.md file
+* jamboard/ --jamboard images week5-week8
+* main/ --test code
+* game_vis.go game code with board visualization
+* game.go game code without board visuailization
+
+
 
 
 
