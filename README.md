@@ -18,4 +18,5 @@ go run game_vis.go
 ```
 
 Start a new game
+![start](img/img.png)
 
