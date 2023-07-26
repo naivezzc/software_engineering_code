@@ -33,8 +33,14 @@
 
 
 # 2.Tutorials to run the code
+Download
+```
+git clone https://github.com/naivezzc/software_engineering_code.git
+```
+
 Start the game
 ```
+cd software_engineering_code
 go run game_vis.go
 ```
 
