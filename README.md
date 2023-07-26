@@ -17,7 +17,13 @@ Start the game
 go run game_vis.go
 ```
 
-Start a new game and input to (1, 1)
+Start a new game and input to (A, 1)
 
 ![start](img/newgame.png)
+
+Reverse function: Put a white piece to (D, 3) then (D, 4) is reversed 
+
+![start](img/reverse.png)
+
+Save the file to 
 
