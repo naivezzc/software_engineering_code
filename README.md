@@ -10,3 +10,10 @@
  * Extra function
    * Board visualize
    * Save and load game
+  
+<pre>
+    <code>
+        go run game_vis.go
+    </code>
+</pre>
+
