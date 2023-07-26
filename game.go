@@ -31,9 +31,19 @@ func playGame() {
 
 	for {
 		printBoard(board)
-		fmt.Printf("Current Player: %s\n", currentPlayer)
+		if currentPlayer == Black {
+			fmt.Printf("Current Player: %s\n", "Black - ○")
+		}
+		if currentPlayer == White {
+			fmt.Printf("Current Player: %s\n", "White - ●")
+		}
+		// fmt.Printf("Current Player: %s\n", currentPlayer)
 
-		fmt.Print("Enter x, y, and color (e.g., A 1 B): ")
+		put_count := CheckPut(board, currentPlayer)
+		fmt.Print("place to put: ", put_count, "\n")
+
+		// fmt.Print("Enter x, y, and color (e.g., A 1 B): ")
+		fmt.Print("Enter x, y (e.g., A 1): ")
 		input, _ := reader.ReadString('\n')
 		input = strings.TrimSpace(input)
 
@@ -42,18 +52,18 @@ func playGame() {
 		}
 
 		parts := strings.Split(input, " ")
-		if len(parts) != 3 {
+		if len(parts) != 2 {
 			fmt.Println("Invalid input!")
 			continue
 		}
 
-		x, y, color := parseInput(parts)
+		x, y := parseInput(parts)
 		if x < 0 || x >= BoardSize || y < 0 || y >= BoardSize {
 			fmt.Println("Invalid coordinates!")
 			continue
 		}
 
-		if !isValidColor(color) {
+		if !isValidColor(currentPlayer) {
 			fmt.Println("Invalid color!")
 			continue
 		}
@@ -63,12 +73,17 @@ func playGame() {
 			continue
 		}
 
-		board[x][y] = color
-		reverse(&board, x, y, color)
+		if !reverse(&board, x, y, currentPlayer) {
+			fmt.Println("Don't put here")
+			continue
+		}
+
+		board[x][y] = currentPlayer
 
 		empty_count := count(board)
 		if empty_count == 0 {
 			fmt.Println("Finish!!!!!!!!!!!!!!!!!!!!")
+			printBoard(board)
 			break
 		}
 
@@ -104,20 +119,28 @@ func printBoard(board Board) {
 	for i := 0; i < BoardSize; i++ {
 		fmt.Printf("%d ", i+1)
 		for j := 0; j < BoardSize; j++ {
-			fmt.Printf("%s ", board[i][j])
+			if board[i][j] == Empty {
+				fmt.Printf("%s ", " ")
+			}
+			if board[i][j] == Black {
+				fmt.Printf("%s ", "○")
+			}
+			if board[i][j] == White {
+				fmt.Printf("%s ", "●")
+			}
 		}
 		fmt.Println()
 	}
 	fmt.Println()
 }
 
-func parseInput(parts []string) (int, int, string) {
+func parseInput(parts []string) (int, int) {
 	x := -1
 	y := -1
-	color := ""
+	// color := ""
 
-	if len(parts[0]) != 1 || len(parts[1]) != 1 || len(parts[2]) != 1 {
-		return x, y, color
+	if len(parts[0]) != 1 || len(parts[1]) != 1 {
+		return x, y
 	}
 
 	// 解析输入的x坐标
@@ -139,7 +162,7 @@ func parseInput(parts []string) (int, int, string) {
 	case "A":
 		y = 0
 	default:
-		return x, y, color
+		return x, y
 	}
 
 	// 解析输入的y坐标（调整映射）
@@ -161,20 +184,20 @@ func parseInput(parts []string) (int, int, string) {
 	case "8":
 		x = 7
 	default:
-		return x, y, color
+		return x, y
 	}
 
 	// 解析输入的颜色
-	switch strings.ToUpper(parts[2]) {
-	case "B":
-		color = Black
-	case "W":
-		color = White
-	default:
-		return x, y, color
-	}
+	// switch strings.ToUpper(parts[2]) {
+	// case "B":
+	// 	color = Black
+	// case "W":
+	// 	color = White
+	// default:
+	// 	return x, y, color
+	// }
 
-	return x, y, color
+	return x, y
 }
 
 func isValidColor(color string) bool {
@@ -185,7 +208,8 @@ func isEmptyPosition(board Board, x, y int) bool {
 	return board[x][y] == Empty
 }
 
-func reverse(board *Board, x, y int, color string) {
+func reverse(board *Board, x, y int, color string) bool {
+	check_reverse := false
 	for _, dir := range directions {
 		flip := [][2]int{}
 		i, j := x+dir[0], y+dir[1]
@@ -197,6 +221,7 @@ func reverse(board *Board, x, y int, color string) {
 			if board[i][j] == color {
 				for _, pos := range flip {
 					board[pos[0]][pos[1]] = color
+					check_reverse = true
 				}
 				break
 			}
@@ -204,6 +229,7 @@ func reverse(board *Board, x, y int, color string) {
 			i, j = i+dir[0], j+dir[1]
 		}
 	}
+	return check_reverse
 }
 
 func count(board Board) int {
@@ -239,4 +265,18 @@ func count(board Board) int {
 		fmt.Printf("Black=%d, White=%d \n", black_count, white_count)
 	}
 	return empty_count
+}
+
+func CheckPut(board Board, currentPlayer string) int {
+	put_count := 0
+	for i := 0; i < BoardSize; i++ {
+		for j := 0; j < BoardSize; j++ {
+			if board[i][j] == Empty {
+				if reverse(&board, i, j, currentPlayer) {
+					put_count += 1
+				}
+			}
+		}
+	}
+	return put_count
 }
