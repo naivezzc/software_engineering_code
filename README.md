@@ -25,5 +25,11 @@ Reverse function: Put a white piece to (D, 3) then (D, 4) is reversed
 
 ![start](img/reverse.png)
 
-Save the file to 
+Save the file to saved_game.txt
+
+![start](img/save.png)
+
+load game from saved_game.txt
+
+![start](img/load.png)
 
