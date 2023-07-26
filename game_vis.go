@@ -12,10 +12,10 @@ import (
 )
 
 const (
-	BoardSize  = 8
-	SquareSize = 60
-	LineWidth  = 2.0
-	Empty     = " "
+		BoardSize  = 8
+		SquareSize = 60
+		LineWidth  = 2.0
+		Empty     = " "
         Black     = "B"
         White     = "W"
 )
@@ -48,7 +48,7 @@ func main() {
                 	fmt.Println("Error saving PNG:", err)
         	}
 
-        	imageFiles := []string{"chessboard.png"}
+        imageFiles := []string{"chessboard.png"}
         	
 		if err := showImage(imageFiles[0]); err != nil {
                 	fmt.Println("无法展示图片:", err)
@@ -154,7 +154,7 @@ func randomlyPlacePieces(dc *gg.Context, board Board) {
 
 func showImage(filename string) error {
         // 调用系统的默认图片查看器打开图片
-        cmd := exec.Command("xdg-open", filename)
+        cmd := exec.Command("feh", filename)
         err := cmd.Start()
         if err != nil {
                 return err
