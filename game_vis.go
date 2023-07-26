@@ -12,22 +12,24 @@ import (
 )
 
 const (
-		BoardSize  = 8
-		SquareSize = 60
-		LineWidth  = 2.0
-		Empty     = " "
+	BoardSize  = 8
+	SquareSize = 60
+	LineWidth  = 2.0
+	Empty     = " "
         Black     = "B"
         White     = "W"
 )
 
 var (
 	BoardColors = []string{"#FFCE9E", "#D18B47"}
-	PieceColors = []string{"#000000", "#FFFFFF"} // 黑色和白色
+	PieceColors = []string{"#000000", "#FFFFFF"} // black and white
 )
 
 type Board [BoardSize][BoardSize]string
 
 var currentPlayer string
+
+var color string
 
 var directions = [][2]int{{-1, 0}, {1, 0}, {0, -1}, {0, 1}, {-1, -1}, {-1, 1}, {1, -1}, {1, 1}}
 
@@ -35,7 +37,7 @@ func main() {
 	board := initializeBoard()
 	rand.Seed(time.Now().UnixNano())
 	reader := bufio.NewReader(os.Stdin)
-
+	currentPlayer = Black
 
 	for {
 		printBoard(board)
@@ -48,15 +50,15 @@ func main() {
                 	fmt.Println("Error saving PNG:", err)
         	}
 
-        imageFiles := []string{"chessboard.png"}
+	        imageFiles := []string{"chessboard.png"}
         	
 		if err := showImage(imageFiles[0]); err != nil {
-                	fmt.Println("无法展示图片:", err)
+                	fmt.Println("image load failed:", err)
         	}
 
 		fmt.Printf("Current Player: %s\n", currentPlayer)
 
-		fmt.Print("Enter x, y, and color (e.g., A 1 B): ")
+		fmt.Print("Enter x, y, and color (e.g., A 1): ")
 		input, _ := reader.ReadString('\n')
 		input = strings.TrimSpace(input)
 
@@ -65,27 +67,24 @@ func main() {
 		}
 
 		parts := strings.Split(input, " ")
-		if len(parts) != 3 {
+		if len(parts) != 2 {
 			fmt.Println("Invalid input!")
 			continue
 		}
 
-		x, y, color := parseInput(parts)
+		x, y := parseInput(parts)
 		if x < 0 || x >= BoardSize || y < 0 || y >= BoardSize {
 			fmt.Println("Invalid coordinates!")
 			continue
 		}
 
-		if !isValidColor(color) {
-			fmt.Println("Invalid color!")
-			continue
-		}
 
 		if !isEmptyPosition(board, x, y) {
 			fmt.Println("The specified position is not empty!")
 			continue
 		}
 
+		color := currentPlayer
 		board[x][y] = color
 		reverse(&board, x, y, color)
 
@@ -154,7 +153,7 @@ func randomlyPlacePieces(dc *gg.Context, board Board) {
 
 func showImage(filename string) error {
         // 调用系统的默认图片查看器打开图片
-        cmd := exec.Command("feh", filename)
+        cmd := exec.Command("xdg-open", filename)
         err := cmd.Start()
         if err != nil {
                 return err
@@ -200,13 +199,12 @@ func printBoard(board Board) {
 	fmt.Println()
 }
 
-func parseInput(parts []string) (int, int, string) {
+func parseInput(parts []string) (int, int) {
 	x := -1
 	y := -1
-	color := ""
 
-	if len(parts[0]) != 1 || len(parts[1]) != 1 || len(parts[2]) != 1 {
-		return x, y, color
+	if len(parts[0]) != 1 || len(parts[1]) != 1{
+		return x, y
 	}
 
 	// 解析输入的x坐标
@@ -228,7 +226,7 @@ func parseInput(parts []string) (int, int, string) {
 	case "A":
 		y = 0
 	default:
-		return x, y, color
+		return x, y
 	}
 
 	// 解析输入的y坐标（调整映射）
@@ -250,25 +248,13 @@ func parseInput(parts []string) (int, int, string) {
 	case "8":
 		x = 7
 	default:
-		return x, y, color
+		return x, y
 	}
 
-	// 解析输入的颜色
-	switch strings.ToUpper(parts[2]) {
-	case "B":
-		color = Black
-	case "W":
-		color = White
-	default:
-		return x, y, color
-	}
 
-	return x, y, color
+	return x, y
 }
 
-func isValidColor(color string) bool {
-	return color == Black || color == White
-}
 
 func isEmptyPosition(board Board, x, y int) bool {
 	return board[x][y] == Empty
