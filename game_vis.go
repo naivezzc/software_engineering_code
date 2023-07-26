@@ -9,13 +9,14 @@ import (
 	"bufio"
 	"os"
 	"strings"
+	"io/ioutil"
 )
 
 const (
 	BoardSize  = 8
 	SquareSize = 60
 	LineWidth  = 2.0
-	Empty     = " "
+	Empty     = "0"
         Black     = "B"
         White     = "W"
 )
@@ -31,13 +32,52 @@ var currentPlayer string
 
 var color string
 
+var is_load bool
+
+var filename string
+
+var orderfile string
+
 var directions = [][2]int{{-1, 0}, {1, 0}, {0, -1}, {0, 1}, {-1, -1}, {-1, 1}, {1, -1}, {1, 1}}
 
 func main() {
-	board := initializeBoard()
 	rand.Seed(time.Now().UnixNano())
 	reader := bufio.NewReader(os.Stdin)
 	currentPlayer = Black
+	filename = "saved_game.txt"
+	orderfile = "player_order.txt"
+ 
+	fmt.Print("Do you wanna load game?（true or false）: ")
+
+	scanner := bufio.NewScanner(os.Stdin)
+	scanner.Scan()
+
+	_, err := fmt.Sscan(scanner.Text(), &is_load)
+	if err != nil {
+		fmt.Println("input error：", err)
+		return
+	}
+
+	var board Board
+
+	if is_load {
+		fmt.Println("game was loaded")
+		board, err = loadBoardFromTxt(filename)
+		if err != nil {
+			fmt.Println("load failed:", err)
+			return
+		}
+		currentPlayer, err = loadCurrentPlayer(orderfile)
+    		if err != nil {
+        		fmt.Println("Error loading currentPlayer:", err)
+       			return
+    		}
+	} else {
+		board = initializeBoard()
+		fmt.Println("start a new game")
+	}
+
+	clearInputBuffer(scanner)
 
 	for {
 		printBoard(board)
@@ -58,11 +98,26 @@ func main() {
 
 		fmt.Printf("Current Player: %s\n", currentPlayer)
 
-		fmt.Print("Enter x, y, and color (e.g., A 1): ")
+		fmt.Print("Enter x, y(e.g., A 1) save/quit: ")
 		input, _ := reader.ReadString('\n')
 		input = strings.TrimSpace(input)
 
 		if input == "quit" {
+			break
+		}
+
+		if input == "save"{
+			err := saveBoardToTxt(board, filename)
+			if err != nil {
+				fmt.Println("save failed:", err)
+				return
+			}
+		        err = saveCurrentPlayer(currentPlayer, orderfile)
+   			if err != nil {
+        			fmt.Println("Error saving currentPlayer:", err)
+        			return
+    			}
+			fmt.Println("game saved")
 			break
 		}
 
@@ -94,7 +149,7 @@ func main() {
 			break
 		}
 
-		// 切换玩家
+		// switch player
 		if currentPlayer == Black {
 			currentPlayer = White
 		} else {
@@ -152,17 +207,17 @@ func randomlyPlacePieces(dc *gg.Context, board Board) {
 
 
 func showImage(filename string) error {
-        // 调用系统的默认图片查看器打开图片
+        // open image by command "xdg-open"
         cmd := exec.Command("xdg-open", filename)
         err := cmd.Start()
         if err != nil {
                 return err
         }
 
-        // 等待一段时间后关闭图片查看器
+        // close image
         time.Sleep(1 * time.Second)
 
-        // 关闭图片查看器进程
+        // kill process
         err = cmd.Process.Kill()
         if err != nil {
                 return err
@@ -192,7 +247,11 @@ func printBoard(board Board) {
 	for i := 0; i < BoardSize; i++ {
 		fmt.Printf("%d ", i+1)
 		for j := 0; j < BoardSize; j++ {
-			fmt.Printf("%s ", board[i][j])
+			if board[i][j] == "0"{
+				fmt.Printf("  ")
+			}else{
+				fmt.Printf("%s ", board[i][j])
+			}
 		}
 		fmt.Println()
 	}
@@ -207,7 +266,7 @@ func parseInput(parts []string) (int, int) {
 		return x, y
 	}
 
-	// 解析输入的x坐标
+	// x axis
 	switch strings.ToUpper(parts[0]) {
 	case "H":
 		y = 7
@@ -229,7 +288,7 @@ func parseInput(parts []string) (int, int) {
 		return x, y
 	}
 
-	// 解析输入的y坐标（调整映射）
+	// y axis
 	switch parts[1] {
 	case "1":
 		x = 0
@@ -314,4 +373,54 @@ func count(board Board) int {
 		fmt.Printf("Black=%d, White=%d \n", black_count, white_count)
 	}
 	return empty_count
+}
+
+func saveBoardToTxt(board Board, filename string) error {
+        data := make([]string, BoardSize)
+        for i := 0; i < BoardSize; i++ {
+                data[i] = strings.Join(board[i][:], " ")
+        }
+        content := strings.Join(data, "\n")
+
+        err := ioutil.WriteFile(filename, []byte(content), 0644)
+        if err != nil {
+                return err
+        }
+        return nil
+}
+
+func loadBoardFromTxt(filename string) (Board, error) {
+        var board Board
+
+        content, err := ioutil.ReadFile(filename)
+        if err != nil {
+                return board, err
+        }
+
+        lines := strings.Split(string(content), "\n")
+        for i, line := range lines {
+                data := strings.Split(line, " ")
+                for j, cell := range data {
+                        board[i][j] = cell
+                }
+        }
+        return board, nil
+}
+
+
+func clearInputBuffer(scanner *bufio.Scanner) {
+	reader := bufio.NewReader(os.Stdin)
+	reader.Discard(reader.Buffered())
+}
+
+func saveCurrentPlayer(currentPlayer string, filename string) error {
+    return ioutil.WriteFile(filename, []byte(currentPlayer), 0644)
+}
+
+func loadCurrentPlayer(filename string) (string, error) {
+    data, err := ioutil.ReadFile(filename)
+    if err != nil {
+        return "", err
+    }
+    return string(data), nil
 }
