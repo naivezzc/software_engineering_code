@@ -17,6 +17,7 @@ Start the game
 go run game_vis.go
 ```
 
-Start a new game
-![start](img/img.png)
+Start a new game and input to (1, 1)
+
+![start](img/newgame.png)
 
