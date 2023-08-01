@@ -96,7 +96,13 @@ func main() {
                 	fmt.Println("image load failed:", err)
         	}
 
-		fmt.Printf("Current Player: %s\n", currentPlayer)
+		//fmt.Printf("Current Player: %s\n", currentPlayer)
+		if currentPlayer == Black {
+			fmt.Printf("Current Player: %s\n", "Black - ○")
+		}
+		if currentPlayer == White {
+			fmt.Printf("Current Player: %s\n", "White - ●")
+		}
 
 		fmt.Print("Enter x, y(e.g., A 1) save/quit: ")
 		input, _ := reader.ReadString('\n')
