@@ -247,10 +247,14 @@ func printBoard(board Board) {
 	for i := 0; i < BoardSize; i++ {
 		fmt.Printf("%d ", i+1)
 		for j := 0; j < BoardSize; j++ {
-			if board[i][j] == "0"{
-				fmt.Printf("  ")
-			}else{
-				fmt.Printf("%s ", board[i][j])
+			if board[i][j] == Empty {
+				fmt.Printf("%s ", " ")
+			}
+			if board[i][j] == Black {
+				fmt.Printf("%s ", "○")
+			}
+			if board[i][j] == White {
+				fmt.Printf("%s ", "●")
 			}
 		}
 		fmt.Println()
