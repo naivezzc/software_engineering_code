@@ -96,7 +96,13 @@ func main() {
                 	fmt.Println("image load failed:", err)
         	}
 
-		fmt.Printf("Current Player: %s\n", currentPlayer)
+		//fmt.Printf("Current Player: %s\n", currentPlayer)
+		if currentPlayer == Black {
+			fmt.Printf("Current Player: %s\n", "Black - ○")
+		}
+		if currentPlayer == White {
+			fmt.Printf("Current Player: %s\n", "White - ●")
+		}
 
 		fmt.Print("Enter x, y(e.g., A 1) save/quit: ")
 		input, _ := reader.ReadString('\n')
@@ -247,10 +253,14 @@ func printBoard(board Board) {
 	for i := 0; i < BoardSize; i++ {
 		fmt.Printf("%d ", i+1)
 		for j := 0; j < BoardSize; j++ {
-			if board[i][j] == "0"{
-				fmt.Printf("  ")
-			}else{
-				fmt.Printf("%s ", board[i][j])
+			if board[i][j] == Empty {
+				fmt.Printf("%s ", " ")
+			}
+			if board[i][j] == Black {
+				fmt.Printf("%s ", "○")
+			}
+			if board[i][j] == White {
+				fmt.Printf("%s ", "●")
 			}
 		}
 		fmt.Println()
