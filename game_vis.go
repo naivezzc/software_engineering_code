@@ -144,6 +144,11 @@ func main() {
 			fmt.Println("The specified position is not empty!")
 			continue
 		}
+		
+		if !reverse(&board, x, y, currentPlayer) {
+			fmt.Println("Don't put here")
+			continue
+		}
 
 		color := currentPlayer
 		board[x][y] = color
@@ -329,7 +334,7 @@ func isEmptyPosition(board Board, x, y int) bool {
 	return board[x][y] == Empty
 }
 
-func reverse(board *Board, x, y int, color string) {
+/*func reverse(board *Board, x, y int, color string) {
 	for _, dir := range directions {
 		flip := [][2]int{}
 		i, j := x+dir[0], y+dir[1]
@@ -348,6 +353,31 @@ func reverse(board *Board, x, y int, color string) {
 			i, j = i+dir[0], j+dir[1]
 		}
 	}
+}
+*/
+
+func reverse(board *Board, x, y int, color string) bool {
+	check_reverse := false
+	for _, dir := range directions {
+		flip := [][2]int{}
+		i, j := x+dir[0], y+dir[1]
+
+		for i >= 0 && i < 8 && j >= 0 && j < 8 {
+			if board[i][j] == Empty {
+				break
+			}
+			if board[i][j] == color {
+				for _, pos := range flip {
+					board[pos[0]][pos[1]] = color
+					check_reverse = true
+				}
+				break
+			}
+			flip = append(flip, [2]int{i, j})
+			i, j = i+dir[0], j+dir[1]
+		}
+	}
+	return check_reverse
 }
 
 func count(board Board) int {
